@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
-#endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerInput))]
 public class ThirdPersonController : MonoBehaviour
 {
     [Header("Player")]
@@ -92,6 +91,7 @@ public class ThirdPersonController : MonoBehaviour
 
     private Animator _animator;
     private CharacterController _controller;
+    private PlayerInput _playerInput;
     private StarterAssetsInputs _input;
     private GameObject _mainCamera;
 
@@ -103,8 +103,7 @@ public class ThirdPersonController : MonoBehaviour
     {
         get
         {
-            //return _playerInput.currentControlScheme == "KeyboardMouse";
-            return true;
+            return _playerInput.currentControlScheme == "KeyboardMouse";
         }
     }
 
@@ -125,6 +124,7 @@ public class ThirdPersonController : MonoBehaviour
         _hasAnimator = TryGetComponent(out _animator);
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<StarterAssetsInputs>();
+        _playerInput = GetComponent<PlayerInput>();
 
         AssignAnimationIDs();
 
