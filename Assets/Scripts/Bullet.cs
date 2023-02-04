@@ -17,7 +17,7 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         float distance = (transform.position - start).magnitude;
-        if (distance >= 50)
+        if (distance >= 30)
         {
             Destroy(gameObject);
         }
