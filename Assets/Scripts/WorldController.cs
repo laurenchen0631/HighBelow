@@ -29,8 +29,6 @@ public class WorldController : MonoBehaviour
         if (!hitUnderGround && !isRotating)
         {
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
-            //Debug.Log(hit.gameObject.transform.up);
-            Debug.Log(axis);
             isRotating = true;
             player.GetComponent<ThirdPersonController>().enabled = false;
             player.GetComponent<CharacterController>().enabled = false;
@@ -40,17 +38,12 @@ public class WorldController : MonoBehaviour
 
     private IEnumerator RotateWorld(Vector3 axis, GameObject wall, Vector3 local)
     {
-        //var fromAngle = environment.transform.localRotation;
-        //var toAngle = Quaternion.Euler(environment.transform.localRotation.eulerAngles + axis * 90);
-        float lastTime = 0;
         for (float t = 0; t < rotationDuration; t += Time.deltaTime)
         {
             environment.transform.Rotate(axis, 90 * Time.deltaTime / rotationDuration, Space.World);
             player.transform.position = wall.transform.TransformPoint(local);
-            lastTime = t;
             yield return null;
         }
-        Debug.Log(lastTime);
 
         environment.transform.eulerAngles = new Vector3(
             Mathf.Round(environment.transform.eulerAngles.x / 90) * 90,

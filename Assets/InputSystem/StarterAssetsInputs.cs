@@ -8,6 +8,7 @@ public class StarterAssetsInputs : MonoBehaviour
 	public Vector2 look;
 	public bool jump;
 	public bool sprint;
+	public bool dodge;
 
 	[Header("Movement Settings")]
 	public bool analogMovement;
@@ -38,6 +39,11 @@ public class StarterAssetsInputs : MonoBehaviour
 	{
 		SprintInput(value.isPressed);
 	}
+
+	public void OnDodge(InputValue value)
+	{
+		dodge = value.isPressed;
+    }
 
 	public void MoveInput(Vector2 newMoveDirection)
 	{
