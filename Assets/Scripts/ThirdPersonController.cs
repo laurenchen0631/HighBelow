@@ -370,4 +370,9 @@ public class ThirdPersonController : MonoBehaviour
     private void OnLand(AnimationEvent animationEvent)
     {
     }
+
+    public void CancelJump()
+    {
+        _verticalVelocity = 0;
+    }
 }

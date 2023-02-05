@@ -7,6 +7,7 @@ public class WorldController : MonoBehaviour
 {
     private GameObject player;
     public GameObject environment;
+    public LayerMask platform;
 
     public bool isRotating = false;
     public float rotationDuration = 1f;
@@ -25,10 +26,12 @@ public class WorldController : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        int layer = 1 << hit.gameObject.layer;
         bool hitUnderGround = Mathf.Abs(hit.moveDirection.y + 1) < 0.1;
-        if (!hitUnderGround && !isRotating)
+        if ((layer & platform) > 0 && !hitUnderGround && !isRotating)
         {
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
+            Debug.Log(axis);
             isRotating = true;
             player.GetComponent<ThirdPersonController>().enabled = false;
             player.GetComponent<CharacterController>().enabled = false;
@@ -38,21 +41,30 @@ public class WorldController : MonoBehaviour
 
     private IEnumerator RotateWorld(Vector3 axis, GameObject wall, Vector3 local)
     {
+        float angle = 90f;
+        if (axis == Vector3.zero)
+        {
+            axis = Vector3.right;
+            angle = 180;
+        }
+
         for (float t = 0; t < rotationDuration; t += Time.deltaTime)
         {
-            environment.transform.Rotate(axis, 90 * Time.deltaTime / rotationDuration, Space.World);
+            environment.transform.Rotate(axis, angle * Time.deltaTime / rotationDuration, Space.World);
             player.transform.position = wall.transform.TransformPoint(local);
             yield return null;
         }
 
         environment.transform.eulerAngles = new Vector3(
-            Mathf.Round(environment.transform.eulerAngles.x / 90) * 90,
-            Mathf.Round(environment.transform.eulerAngles.y / 90) * 90,
-            Mathf.Round(environment.transform.eulerAngles.z / 90) * 90
+            Mathf.Round(environment.transform.eulerAngles.x / angle) * angle,
+            Mathf.Round(environment.transform.eulerAngles.y / angle) * angle,
+            Mathf.Round(environment.transform.eulerAngles.z / angle) * angle
         );
 
         player.transform.position = wall.transform.TransformPoint(local);
-        player.transform.position = new Vector3(player.transform.position.x, -0.5f, player.transform.position.z);
+        player.GetComponent<ThirdPersonController>().CancelJump();
+
+        //player.transform.position = new Vector3(player.transform.position.x, -0.5f, player.transform.position.z);
         isRotating = false;
         player.GetComponent<ThirdPersonController>().enabled = true;
         player.GetComponent<CharacterController>().enabled = true;
