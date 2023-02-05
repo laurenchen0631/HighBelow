@@ -28,10 +28,12 @@ public class WorldController : MonoBehaviour
     {
         int layer = 1 << hit.gameObject.layer;
         bool hitUnderGround = Mathf.Abs(hit.moveDirection.y + 1) < 0.1;
-        if ((layer & platform) > 0 && !hitUnderGround && !isRotating)
+
+        if ((layer & platform) > 0 && !hitUnderGround && !isRotating )
         {
+            //Debug.Log($"{hit.moveDirection}, {hit.moveDirection.magnitude}");
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
-            Debug.Log(axis);
+            //Debug.Log(axis);
             isRotating = true;
             player.GetComponent<ThirdPersonController>().enabled = false;
             player.GetComponent<CharacterController>().enabled = false;
