@@ -11,7 +11,6 @@ using UnityEngine.InputSystem;
 public class ThirdPersonController : MonoBehaviour
 {
     [Header("Player")]
-
     public bool isDodging = false;
     public bool isInvincible = false;
 
@@ -221,7 +220,7 @@ public class ThirdPersonController : MonoBehaviour
     private void Move()
     {
         // set target speed based on move speed, sprint speed and if sprint is pressed
-        float targetSpeed = MoveSpeed * (isDodging ? 4 : 1);
+        float targetSpeed = MoveSpeed * (isDodging ? 3 : 1);
 
         // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -242,7 +241,7 @@ public class ThirdPersonController : MonoBehaviour
             // creates curved result rather than a linear one giving a more organic speed change
             // note T in Lerp is clamped, so we don't need to clamp our speed
             _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                Time.deltaTime * SpeedChangeRate * (isDodging ? 3 : 1));
+                Time.deltaTime * SpeedChangeRate * (isDodging ? 1.3f : 1));
 
             // round speed to 3 decimal places
             _speed = Mathf.Round(_speed * 1000f) / 1000f;

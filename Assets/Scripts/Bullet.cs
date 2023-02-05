@@ -10,7 +10,6 @@ public class Bullet : MonoBehaviour
     private void Start()
     {
         start = transform.position;
-        GetComponent<MeshRenderer>().material.color = Color.cyan;
     }
 
     // Update is called once per frame
