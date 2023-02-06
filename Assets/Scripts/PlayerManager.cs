@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Windows;
 using UnityEngine.InputSystem;
 using TMPro;
+using System.Linq;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(ThirdPersonController))]
@@ -15,6 +16,7 @@ public class PlayerManager : MonoBehaviour
     private WorldController worldController;
     [SerializeField] private BulletDetection attackDetector;
     [SerializeField] private TextMeshProUGUI dodgeHint;
+    [SerializeField] private TextMeshProUGUI hpText;
 
     public float dodgeDuration = 0.5f;
     public float invincibleDuration = 0.35f;
@@ -41,20 +43,14 @@ public class PlayerManager : MonoBehaviour
         input = GetComponent<StarterAssetsInputs>();
         attackDetector.onAttackEnter += HandleAttackEnter;
         attackDetector.onAttackExit += HandleAttackLeave;
+        hpText.text = string.Join(" ", Enumerable.Repeat("<3", hp));
     }
 
     private void Update()
     {
-        if (attackInRange > 0 && !dodgeHint.IsActive())
-        {
-            dodgeHint.gameObject.SetActive(true);
-        }
-        if ((attackInRange == 0 || isInBulletTime) && dodgeHint.IsActive())
-        {
-            dodgeHint.gameObject.SetActive(false);
-        }
-
+        DodgeHint();
         Dodge();
+        hpText.text = string.Join(" ", Enumerable.Repeat("<3", hp));
     }
 
     private void OnTriggerEnter(Collider other)
@@ -64,10 +60,20 @@ public class PlayerManager : MonoBehaviour
             attackInRange -= 1;
             if (!isInvincible && !worldController.isRotating)
             {
-                hp -= 1;
-                bloodEffect.gameObject.transform.position = new Vector3(transform.position.x, 0.2f, transform.position.z);
-                bloodEffect.Play();
+                StartCoroutine(DamageAction(1));
             }
+        }
+    }
+
+    private void DodgeHint()
+    {
+        if (attackInRange > 0 && !dodgeHint.IsActive())
+        {
+            dodgeHint.gameObject.SetActive(true);
+        }
+        if ((attackInRange == 0 || isInBulletTime) && dodgeHint.IsActive())
+        {
+            dodgeHint.gameObject.SetActive(false);
         }
     }
 
@@ -78,6 +84,7 @@ public class PlayerManager : MonoBehaviour
             input.dodge = false;
             if (!worldController.isRotating)
             {
+                Debug.Log(attackInRange);
                 StartCoroutine(DodgeAction());
             }
         }
@@ -131,5 +138,15 @@ public class PlayerManager : MonoBehaviour
         dodgeHint.gameObject.SetActive(true);
         yield return new WaitForSeconds(1);
         dodgeHint.gameObject.SetActive(false);
+    }
+
+    private IEnumerator DamageAction(int damage)
+    {
+        hp -= 1;
+        bloodEffect.gameObject.transform.position = new Vector3(transform.position.x, 0.2f, transform.position.z);
+        bloodEffect.Play();
+        isInvincible = true;
+        yield return new WaitForSeconds(1);
+        isInvincible = false;
     }
 }

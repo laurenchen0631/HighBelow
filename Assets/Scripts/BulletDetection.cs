@@ -9,7 +9,6 @@ public class BulletDetection : MonoBehaviour
     //public GameObject player;
      private ThirdPersonController player;
     public TextMeshProUGUI dodgeHint;
-    private bool bulletTime = false;
 
     public delegate void DetectionAction();
     public DetectionAction onAttackEnter;
@@ -22,8 +21,7 @@ public class BulletDetection : MonoBehaviour
         dodgeHint.gameObject.SetActive(false);
     }
      
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         transform.position = player.transform.position;
     }
@@ -38,24 +36,5 @@ public class BulletDetection : MonoBehaviour
     {
         if (other.CompareTag("EnemyAttack"))
             onAttackExit?.Invoke();
-    }
-
-    private IEnumerator DodgeHintAction()
-    {
-        dodgeHint.gameObject.SetActive(true);
-        yield return new WaitForSeconds(1);
-        dodgeHint.gameObject.SetActive(false);
-    }
-
-    private IEnumerator SlowTimeAction()
-    {
-        dodgeHint.gameObject.SetActive(false);
-        bulletTime = true;
-        Time.timeScale = 0.2f;
-        player.MoveSpeed *= 2;
-        yield return new WaitForSecondsRealtime(3);
-        player.MoveSpeed /= 2;
-        Time.timeScale = 1f;
-        bulletTime = false;
     }
 }

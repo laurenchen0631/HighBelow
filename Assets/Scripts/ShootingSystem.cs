@@ -26,7 +26,7 @@ public class ShootingSystem : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         transform.LookAt(ray.GetPoint(1000));

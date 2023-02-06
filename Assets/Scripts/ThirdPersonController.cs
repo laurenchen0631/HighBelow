@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.InputSystem;
 using UnityEngine.Windows;
+using UnityEngine.InputSystem.XR;
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
@@ -348,8 +349,9 @@ public class ThirdPersonController : MonoBehaviour
     {
     }
 
-    public void CancelJump()
+    public void CancelMove()
     {
-        _verticalVelocity = 0;
-    }
+        _verticalVelocity = -9;
+        _speed = 0;
+}
 }

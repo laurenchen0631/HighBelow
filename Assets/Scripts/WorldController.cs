@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class WorldController : MonoBehaviour
 {
@@ -27,26 +28,29 @@ public class WorldController : MonoBehaviour
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         int layer = 1 << hit.gameObject.layer;
-        bool hitUnderGround = Mathf.Abs(hit.moveDirection.y + 1) < 0.1;
+        bool hitUnderGround = hit.gameObject.transform.up.y >= 0.9;
 
-        if ((layer & platform) > 0 && !hitUnderGround && !isRotating )
+        if ((layer & platform) > 0 && !hitUnderGround && !isRotating)
         {
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
-            isRotating = true;
-            player.GetComponent<ThirdPersonController>().enabled = false;
-            player.GetComponent<CharacterController>().enabled = false;
-            StartCoroutine(RotateWorld(axis, hit.gameObject, hit.gameObject.transform.InverseTransformPoint(hit.point)));
+            if (axis != Vector3.zero)
+            {
+                isRotating = true;
+                player.GetComponent<ThirdPersonController>().enabled = false;
+                player.GetComponent<CharacterController>().enabled = false;
+                float angle = Mathf.Round(Vector3.Angle(Vector3.up, hit.gameObject.transform.up));
+                StartCoroutine(RotateWorld(axis, angle, hit.gameObject, hit.gameObject.transform.InverseTransformPoint(hit.point)));
+            }
         }
     }
 
-    private IEnumerator RotateWorld(Vector3 axis, GameObject wall, Vector3 local)
+    private IEnumerator RotateWorld(Vector3 axis, float angle, GameObject wall, Vector3 local)
     {
-        float angle = 90f;
-        if (axis == Vector3.zero)
-        {
-            axis = Vector3.right;
-            angle = 180;
-        }
+        //if (axis == Vector3.zero)
+        //{
+        //    axis = Vector3.right;
+        //    angle = 180;
+        //}
 
         for (float t = 0; t < rotationDuration; t += Time.deltaTime)
         {
@@ -62,7 +66,7 @@ public class WorldController : MonoBehaviour
         );
 
         player.transform.position = wall.transform.TransformPoint(local);
-        player.GetComponent<ThirdPersonController>().CancelJump();
+        player.GetComponent<ThirdPersonController>().CancelMove();
 
         //player.transform.position = new Vector3(player.transform.position.x, -0.5f, player.transform.position.z);
         isRotating = false;
