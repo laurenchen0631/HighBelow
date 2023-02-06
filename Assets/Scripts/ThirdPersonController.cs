@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
@@ -11,9 +12,6 @@ using UnityEngine.InputSystem;
 public class ThirdPersonController : MonoBehaviour
 {
     [Header("Player")]
-    public bool isDodging = false;
-    public bool isInvincible = false;
-
     [Tooltip("Move speed of the character in m/s")]
     public float MoveSpeed = 6.0f;
 
@@ -142,7 +140,6 @@ public class ThirdPersonController : MonoBehaviour
     {
         _hasAnimator = TryGetComponent(out _animator);
 
-        Dodge();
         JumpAndGravity();
         GroundedCheck();
         Move();
@@ -160,24 +157,6 @@ public class ThirdPersonController : MonoBehaviour
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-    }
-
-    private void Dodge() {
-        if (_input.dodge && !isDodging)
-        {
-            _input.dodge = false;
-            StartCoroutine(DodgeAction());
-        }
-    }
-
-    private IEnumerator DodgeAction()
-    {
-        isDodging = true;
-        isInvincible = true;
-        yield return new WaitForSeconds(0.35f);
-        isInvincible = false;
-        yield return new WaitForSeconds(0.2f);
-        isDodging = false;
     }
 
 
@@ -220,7 +199,7 @@ public class ThirdPersonController : MonoBehaviour
     private void Move()
     {
         // set target speed based on move speed, sprint speed and if sprint is pressed
-        float targetSpeed = MoveSpeed * (isDodging ? 3 : 1);
+        float targetSpeed = MoveSpeed;
 
         // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -241,7 +220,7 @@ public class ThirdPersonController : MonoBehaviour
             // creates curved result rather than a linear one giving a more organic speed change
             // note T in Lerp is clamped, so we don't need to clamp our speed
             _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                Time.deltaTime * SpeedChangeRate * (isDodging ? 1.3f : 1));
+                Time.deltaTime * SpeedChangeRate);
 
             // round speed to 3 decimal places
             _speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -283,8 +262,6 @@ public class ThirdPersonController : MonoBehaviour
             _animator.SetFloat(_animIDSpeed, _animationBlend);
             _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
         }
-
-        _input.dodge = false;
     }
 
     private void JumpAndGravity()

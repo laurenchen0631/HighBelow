@@ -31,9 +31,7 @@ public class WorldController : MonoBehaviour
 
         if ((layer & platform) > 0 && !hitUnderGround && !isRotating )
         {
-            //Debug.Log($"{hit.moveDirection}, {hit.moveDirection.magnitude}");
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
-            //Debug.Log(axis);
             isRotating = true;
             player.GetComponent<ThirdPersonController>().enabled = false;
             player.GetComponent<CharacterController>().enabled = false;

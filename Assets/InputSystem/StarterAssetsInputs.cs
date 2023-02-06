@@ -35,11 +35,6 @@ public class StarterAssetsInputs : MonoBehaviour
 		JumpInput(value.isPressed);
 	}
 
-	public void OnSprint(InputValue value)
-	{
-		SprintInput(value.isPressed);
-	}
-
 	public void OnDodge(InputValue value)
 	{
 		dodge = value.isPressed;
@@ -58,11 +53,6 @@ public class StarterAssetsInputs : MonoBehaviour
 	public void JumpInput(bool newJumpState)
 	{
 		jump = newJumpState;
-	}
-
-	public void SprintInput(bool newSprintState)
-	{
-		sprint = newSprintState;
 	}
 
 	private void OnApplicationFocus(bool hasFocus)

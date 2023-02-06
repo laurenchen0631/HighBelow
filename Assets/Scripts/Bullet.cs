@@ -5,7 +5,12 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     private Rigidbody bulletRb;
+    public float maxDistance = 30;
+    public GameObject controlSystem;
     private Vector3 start;
+
+    public delegate void HitAction(Collider other);
+    public HitAction onHit;
 
     private void Start()
     {
@@ -16,7 +21,7 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         float distance = (transform.position - start).magnitude;
-        if (distance >= 30)
+        if (distance >= maxDistance)
         {
             Destroy(gameObject);
         }
@@ -24,7 +29,8 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
-        Destroy(gameObject);
+        onHit?.Invoke(other);
+        if (!other.CompareTag("Sensor"))
+            Destroy(gameObject);
     }
 }
