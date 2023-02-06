@@ -11,8 +11,7 @@ public class BulletDetection : MonoBehaviour
     public TextMeshProUGUI dodgeHint;
 
     public delegate void DetectionAction();
-    public DetectionAction onAttackEnter;
-    public DetectionAction onAttackExit;
+    public DetectionAction onDetect;
 
     // Start is called before the first frame update
     void Start()
@@ -26,15 +25,9 @@ public class BulletDetection : MonoBehaviour
         transform.position = player.transform.position;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("EnemyAttack"))
-            onAttackEnter?.Invoke();
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("EnemyAttack"))
-            onAttackExit?.Invoke();
+            onDetect?.Invoke();
     }
 }

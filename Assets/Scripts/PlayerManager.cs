@@ -29,7 +29,7 @@ public class PlayerManager : MonoBehaviour
     private bool isInvincible = false;
     private bool isInBulletTime = false;
 
-    private int attackInRange = 0;
+    private bool isAttackNearby = false;
 
     public ParticleSystem bloodEffect;
     public int hp = 5;
@@ -41,8 +41,7 @@ public class PlayerManager : MonoBehaviour
         playerController = GetComponent<ThirdPersonController>();
         worldController = GetComponent<WorldController>();
         input = GetComponent<StarterAssetsInputs>();
-        attackDetector.onAttackEnter += HandleAttackEnter;
-        attackDetector.onAttackExit += HandleAttackLeave;
+        attackDetector.onDetect += DetectAttack;
         hpText.text = string.Join(" ", Enumerable.Repeat("<3", hp));
     }
 
@@ -57,7 +56,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (other.CompareTag("EnemyAttack"))
         {
-            attackInRange -= 1;
             if (!isInvincible && !worldController.isRotating)
             {
                 StartCoroutine(DamageAction(1));
@@ -67,11 +65,11 @@ public class PlayerManager : MonoBehaviour
 
     private void DodgeHint()
     {
-        if (attackInRange > 0 && !dodgeHint.IsActive())
+        if (isAttackNearby && !dodgeHint.IsActive())
         {
             dodgeHint.gameObject.SetActive(true);
         }
-        if ((attackInRange == 0 || isInBulletTime) && dodgeHint.IsActive())
+        if ((!isAttackNearby || isInBulletTime) && dodgeHint.IsActive())
         {
             dodgeHint.gameObject.SetActive(false);
         }
@@ -84,25 +82,26 @@ public class PlayerManager : MonoBehaviour
             input.dodge = false;
             if (!worldController.isRotating)
             {
-                Debug.Log(attackInRange);
                 StartCoroutine(DodgeAction());
             }
         }
     }
 
-    private void HandleAttackEnter()
+    private void DetectAttack()
     {
-        attackInRange += 1;
+        CancelInvoke("ResetDetection");
+        isAttackNearby = true;
+        Invoke("ResetDetection", 0.1f);
     }
 
-    private void HandleAttackLeave()
+    private void ResetDetection()
     {
-        attackInRange -= 1;
+        isAttackNearby = false;
     }
 
     private IEnumerator DodgeAction()
     {
-        bool shouldSlowTime = attackInRange > 0;
+        bool shouldSlowTime = isAttackNearby;
 
         isDodging = true;
         isInvincible = true;
