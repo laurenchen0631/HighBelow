@@ -12,6 +12,7 @@ public class WorldController : MonoBehaviour
 
     public bool isRotating = false;
     public float rotationDuration = 1f;
+    private float rotationCooldown = 0.5f;
     
 
     // Start is called before the first frame update
@@ -23,14 +24,15 @@ public class WorldController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        rotationCooldown = Mathf.Max(0, rotationCooldown - Time.unscaledDeltaTime);
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         int layer = 1 << hit.gameObject.layer;
-        bool hitUnderGround = hit.gameObject.transform.up.y >= 0.9;
+        bool hitUnderGround = hit.gameObject.transform.up.y >= 0.95;
 
-        if ((layer & platform) > 0 && !hitUnderGround && !isRotating)
+        if ((layer & platform) > 0 && !hitUnderGround && !isRotating && rotationCooldown <= 0)
         {
             Vector3 axis = Vector3.Cross(hit.gameObject.transform.up, Vector3.up);
             if (axis != Vector3.zero)
@@ -46,11 +48,7 @@ public class WorldController : MonoBehaviour
 
     private IEnumerator RotateWorld(Vector3 axis, float angle, GameObject wall, Vector3 local)
     {
-        //if (axis == Vector3.zero)
-        //{
-        //    axis = Vector3.right;
-        //    angle = 180;
-        //}
+        
 
         for (float t = 0; t < rotationDuration; t += Time.deltaTime)
         {
@@ -68,7 +66,7 @@ public class WorldController : MonoBehaviour
         player.transform.position = wall.transform.TransformPoint(local);
         player.GetComponent<ThirdPersonController>().CancelMove();
 
-        //player.transform.position = new Vector3(player.transform.position.x, -0.5f, player.transform.position.z);
+        rotationCooldown = 0.5f;
         isRotating = false;
         player.GetComponent<ThirdPersonController>().enabled = true;
         player.GetComponent<CharacterController>().enabled = true;
